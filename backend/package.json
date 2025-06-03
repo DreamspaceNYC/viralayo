@@ -1,0 +1,9 @@
+{
+  "name": "process-video",
+  "version": "1.0.0",
+  "main": "process-video.js",
+  "type": "commonjs",
+  "dependencies": {
+    "node-appwrite": "^10.2.0"
+  }
+}
