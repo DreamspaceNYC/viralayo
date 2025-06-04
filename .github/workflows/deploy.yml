@@ -1,21 +1,38 @@
-- name: Deploy function
-  env:
-    APPWRITE_ENDPOINT: https://cloud.appwrite.io/v1
-    APPWRITE_PROJECT:  viralayo-app
-    APPWRITE_KEY:      ${{ secrets.APPWRITE_API_KEY }}
-  run: |
-    cd backend
-    tar -czf code.tar.gz process-video.js package.json
+name: Deploy processVideoFn to Appwrite   # 👈  human-readable label
 
-    # 1️⃣  configure the CLI
-    appwrite client \
-      --endpoint   "$APPWRITE_ENDPOINT" \
-      --project-id "$APPWRITE_PROJECT" \
-      --key        "$APPWRITE_KEY"
+on:
+  push:
+    branches: [ main ]                    # run on every push to main
 
-    # 2️⃣  deploy + activate latest build
-    appwrite functions deploy \
-      --function-id processVideoFn \
-      --entrypoint  process-video.js \
-      --code        code.tar.gz \
-      --activate
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣  pull the repo
+      - uses: actions/checkout@v4
+
+      # 2️⃣  install Appwrite CLI
+      - name: Install Appwrite CLI
+        run: npm i -g appwrite-cli@latest
+
+      # 3️⃣  build & deploy the function
+      - name: Deploy function
+        env:
+          APPWRITE_ENDPOINT: https://cloud.appwrite.io/v1
+          APPWRITE_PROJECT:  viralayo-app
+          APPWRITE_KEY:      ${{ secrets.APPWRITE_API_KEY }}
+        run: |
+          cd backend
+          tar -czf code.tar.gz process-video.js package.json
+
+          appwrite client \
+            --endpoint   "$APPWRITE_ENDPOINT" \
+            --project-id "$APPWRITE_PROJECT" \
+            --key        "$APPWRITE_KEY"
+
+          appwrite functions deploy \
+            --function-id processVideoFn \
+            --entrypoint  process-video.js \
+            --code        code.tar.gz \
+            --activate
